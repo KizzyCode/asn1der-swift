@@ -6,7 +6,7 @@
 
 Welcome to `Asn1Der` 🎉
 
-`Asn1Der`  is a basic ASN.1-DER implementation that offers simple de-/encoding support for some basic types:
+`Asn1Der` is a basic ASN.1-DER implementation that offers simple de-/encoding support for some basic types:
  - The `ASN.1-BOOLEAN` type as `DERBoolean` object and Swift's `Bool` type
  - The `ASN.1-INTEGER` type as `DERInteger` object and Swift's `UInt`, `UInt8`, `UInt16`, `UInt32`, `UInt64` types
  - The `ASN.1-NULL` type as `DERNull` object and Swift's `Optional.none` type (which allows the encoding of optional elements)
