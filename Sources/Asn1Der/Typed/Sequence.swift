@@ -7,7 +7,7 @@ final public class DERSequence: DERObject {
 	public static let tag: UInt8 = 0x30
 	
 	/// The subobjects
-	var value: [DERObject]
+	public var value: [DERObject]
 	
 	
 	/// Initializes the DER sequence with `subobjects`
@@ -21,11 +21,11 @@ final public class DERSequence: DERObject {
 		
 		// Create array and counting source
 		var value: [DERObject] = []
-		var source = SwiftDataSource(object.value)
+		var source = object.value
 		
 		// Read elements as long as the source is not empty
-		while !source.isExhausted {
-			value.append(try DERAny(decode: &source, limit: Int.max))
+		while !source.isEmpty {
+			value.append(try DERAny(decode: { try source.read() }, limit: Int.max))
 		}
 		self.value = value
 	}
