@@ -68,6 +68,11 @@ final public class DERSequence: DERObject {
 		self.value.forEach({ try! $0.encode(to: &value) })
 		return DERAny(tag: Self.tag, value: value)
 	}
+	
+	/// Returns an iterator over the sequence's elements
+	public func makeIterator() {
+		DERSequenceIterator(sequence: self)
+	}
 }
 
 
