@@ -7,7 +7,7 @@ final public class DERUTF8String: DERObject {
 	public static let tag: UInt8 = 0x0c
 
 	/// The string value
-	let value: String
+	public let value: String
 
 
 	/// Initializes the DER UTF-8 string with `string`
