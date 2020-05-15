@@ -4,12 +4,12 @@ import XCTest
 final class Asn1DerTestOk: XCTestCase {
 	func testLengthOk() throws {
 		for test in TestVectors.Ok.tests.length {
-			var source = SwiftDataSource(test.bytes)
-			let (value, _) = try source.readLength()
+			var source = Data(test.bytes)
+			let value = try Int(decodeLength: { try source.read() })
 			XCTAssertEqual(value, test.value, "@\"\(test.name)\"")
 			
 			var bytes = Data()
-			try bytes.writeLength(length: test.value)
+			bytes.writeLength(test.value)
 			XCTAssertEqual(bytes, Data(test.bytes), "@\"\(test.name)\"")
 		}
 	}
@@ -127,6 +127,7 @@ final class Asn1DerTestOk: XCTestCase {
 	}
 	
 	
+	// Ensure that our example compiles
 	func assertExample() {
 		// Declare an encoded integer with value `7`
 		let encoded = Data([0x02, 0x01, 0x07])

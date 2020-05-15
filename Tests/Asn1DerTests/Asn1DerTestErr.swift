@@ -4,8 +4,8 @@ import XCTest
 final class Asn1DerTestErr: XCTestCase {
 	func testLengthErr() {
 		for test in TestVectors.Err.tests.length {
-			var source = SwiftDataSource(test.bytes)
-			XCTAssertThrowsError(try source.readLength(), "@\"\(test.name)\"", {
+			var source = Data(test.bytes)
+			XCTAssertThrowsError(try Int(decodeLength: { try source.read() }), "@\"\(test.name)\"", {
 				XCTAssertEqual($0.kind, test.err, "@\"\(test.name)\"")
 			})
 		}
