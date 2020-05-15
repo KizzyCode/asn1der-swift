@@ -20,25 +20,33 @@ public enum DERError: Error {
 public protocol DERObject {
 	/// Inits `Self` with `object`
 	init(with object: DERAny) throws
+	/// DER decodes `Self` from `data`
+	init<D: DataProtocol>(decode data: D) throws
+	/// DER decodes `Self` from `source` if the total encoded size of `self` does not exceed limit
+	init(decode source: @escaping () throws -> UInt8, limit: Int) throws
 	
 	/// Creates an untyped/generic DER object from `self`
 	func object() -> DERAny
+	/// DER encodes `self` to `data`
+	func encode(to data: inout Data) throws
+	/// DER encodes `self`
+	func encode() -> Data
 }
 public extension DERObject {
-	/// DER decodes `Self` from `source` if the total encoded size of `self` does not exceed limit
-	init<S: DataSource>(decode source: inout S, limit: Int) throws {
-		let object = try DERAny(decode: &source, limit: limit)
-		try self.init(with: object)
-	}
 	/// DER decodes `Self` from `data`
 	init<D: DataProtocol>(decode data: D) throws {
-		var source = SwiftDataSource(data)
-		try self.init(decode: &source, limit: Int.max)
+		var data = Data(data)
+		try self.init(decode: { try data.read() }, limit: Int.max)
+	}
+	/// DER decodes `Self` from `source` if the total encoded size of `self` does not exceed limit
+	init(decode source: @escaping () throws -> UInt8, limit: Int) throws {
+		let object = try DERAny(decode: source, limit: limit)
+		try self.init(with: object)
 	}
 	
-	/// DER encodes `self` to `sink`
-	func encode<S: DataSink>(to sink: inout S) throws {
-		try self.object().encode(to: &sink)
+	/// DER encodes `self` to `data`
+	func encode(to data: inout Data) throws {
+		self.object().encode(to: &data)
 	}
 	/// DER encodes `self`
 	func encode() -> Data {
@@ -50,7 +58,7 @@ public extension DERObject {
 
 
 /// An untyped/generic DER object
-final public class DERAny: DERObject {
+final public class DERAny {
 	/// The object tag
 	public let tag: UInt8
 	/// The object value
@@ -62,34 +70,42 @@ final public class DERAny: DERObject {
 		self.tag = tag
 		self.value = Data(value)
 	}
-	public init(with object: DERAny) {
-		self.tag = object.tag
-		self.value = object.value
+}
+extension DERAny: DERObject {
+	public convenience init(with object: DERAny) {
+		self.init(tag: object.tag, value: object.value)
 	}
-	/// Decodes `Self` from `source` if the total encoded size of `self` does not exceed limit
-	public init<S: DataSource>(decode source: inout S, limit: Int) throws {
+	public convenience init(decode nextByte: @escaping () throws -> UInt8, limit: Int) throws {
 		// Read tag
-		self.tag = try source.read()
-		let (length, lengthFieldSize) = try source.readLength()
+		let tag = try nextByte()
 		
-		// Validate limit and read value
-		guard let total = Int(checkedSum: 1, lengthFieldSize, length) else {
+		// Read length
+		var lengthSize = 0
+		let length = try Int(decodeLength: {
+			lengthSize += 1
+			return try nextByte()
+		})
+		
+		// Validate limit
+		guard let total = Int(checkedSum: 1, lengthSize, length) else {
 			throw DERError.unsupported("Cannot decode object because it's length would exceed `Int.max`")
 		}
 		guard total <= limit else {
 			throw DERError.other("Cannot decode object because it's length would exceed the given limit")
 		}
-		self.value = try source.read(count: length)
+		
+		// Read value and create object
+		let value = try Data(from: nextByte, length: length)
+		self.init(tag: tag, value: value)
 	}
 	
 	public func object() -> DERAny {
 		self
 	}
-	
-	/// Encodes `self` to `sink`
-	public func encode<S: DataSink>(to sink: inout S) throws {
-		try sink.write(self.tag)
-		try! sink.writeLength(length: self.value.count)
-		try sink.write(self.value)
+	// "Override" the propagating default implementation with the real implementationb here
+	public func encode(to data: inout Data) {
+		data.write(self.tag)
+		data.writeLength(self.value.count)
+		data.write(self.value)
 	}
 }
