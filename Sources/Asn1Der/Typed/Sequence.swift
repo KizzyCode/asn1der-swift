@@ -70,7 +70,7 @@ final public class DERSequence: DERObject {
 	}
 	
 	/// Returns an iterator over the sequence's elements
-	public func makeIterator() {
+	public func makeIterator() -> DERSequenceIterator {
 		DERSequenceIterator(sequence: self)
 	}
 }
