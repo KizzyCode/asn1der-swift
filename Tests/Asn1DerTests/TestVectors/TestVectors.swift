@@ -5,10 +5,10 @@ import XCTest
 public struct TestVectors {
 	/// The test vectors for valid objects
 	public struct Ok {
-    	public struct Length: Decodable {
-    		public let name: String
-    		public let bytes: [UInt8]
-    		public let value: Int
+		public struct Length: Decodable {
+			public let name: String
+			public let bytes: [UInt8]
+			public let value: Int
 		}
 		
 		
