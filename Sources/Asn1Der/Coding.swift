@@ -1,18 +1,6 @@
 import Foundation
 
 
-/// An ARC managed box to share pass-by-value/implicit-copy elements like structs etc
-internal class Box<T> {
-	/// The wrapped value
-	public var boxed: T
-	
-	/// Creates a new `Box` around element
-	public init(_ element: T) {
-		self.boxed = element
-	}
-}
-
-
 // Implement big-endian byte coding methods for unsigned integers
 internal extension BinaryInteger where Self: FixedWidthInteger, Self: UnsignedInteger {
 	/// The byte width of `Self`
