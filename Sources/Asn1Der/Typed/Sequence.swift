@@ -6,6 +6,9 @@ final public class DERSequenceIterator {
 	private let sequence: DERSequence
 	private var position = 0
 	
+	/// The amount of elements remaining in this iterator
+	public var remaining: Int { self.sequence.value.count - self.position }
+	
 	/// Initializes the iterator with a `sequence`
 	init(sequence: DERSequence) {
 		self.sequence = sequence
@@ -23,12 +26,12 @@ extension DERSequenceIterator: IteratorProtocol {
 	public typealias Element = DERObject
 	
 	public func next() -> DERObject? {
-		switch self.sequence.value.count {
-			case let count where self.position < count:
+		switch self.remaining {
+			case 0:
+				return nil
+			default:
 				defer{ self.position += 1 }
 				return self.sequence.value[self.position]
-			default:
-				return nil
 		}
 	}
 }
