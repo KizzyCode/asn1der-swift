@@ -127,26 +127,37 @@ final class Asn1DerTestOk: XCTestCase {
 	}
 	
 	
-	// Ensure that our example compiles
-	func assertExample() {
+	// Ensure that our example works
+	func testExample() throws {
 		// Declare an encoded integer with value `7`
-		let encoded = Data([0x02, 0x01, 0x07])
+		let encodedInt = Data([0x02, 0x01, 0x07])
 
 		// Decode a generic DER object
-		let object = try! DERAny(decode: encoded)
+		let object = try DERAny(decode: encodedInt)
 
 		// Reencode the object
-		let encodedObject = object.encode()
-		precondition(encoded == encodedObject)
+		let reencodedObject = object.encode()
+		XCTAssertEqual(reencodedObject, encodedInt)
 
 
 		// Decode an UInt32
-		let uint = try! UInt32(decode: encoded)
-		precondition(uint == 7)
+		let uint = try UInt32(decode: encodedInt)
+		XCTAssertEqual(uint, 7)
 
 		// Reencode the integer
-		let encodedInteger = uint.encode()
-		precondition(encoded == encodedInteger)
+		let reencodedInt = uint.encode()
+		XCTAssertEqual(reencodedInt, encodedInt)
+		
+		
+		// Decode a `RawRepresentable` enum
+		enum TestEnum: String, DERObject {
+			case variantA = "Variant A", variantB = "Variant B"
+		}
+		let encodedTestEnum = Data([0x0c, 0x09, 0x56, 0x61, 0x72, 0x69, 0x61, 0x6E, 0x74, 0x20, 0x41])
+		
+		// Decode the enum
+		let testEnum: TestEnum = try TestEnum(decode: encodedTestEnum)
+		XCTAssertEqual(testEnum, .variantA)
 	}
 
 
@@ -158,6 +169,7 @@ final class Asn1DerTestOk: XCTestCase {
 		("testNullOk", testNullOk),
 		("testOctetStringOk", testOctetStringOk),
 		("testSequenceOk", testSequenceOk),
-		("testUTF8StringOk", testUTF8StringOk)
+		("testUTF8StringOk", testUTF8StringOk),
+		("testExample", testExample),
 	]
 }

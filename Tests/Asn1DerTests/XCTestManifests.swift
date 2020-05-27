@@ -32,6 +32,7 @@ extension Asn1DerTestOk {
 	// to regenerate.
 	static let __allTests__Asn1DerTestOk = [
 		("testBooleanOk", testBooleanOk),
+		("testExample", testExample),
 		("testIntegerOk", testIntegerOk),
 		("testLengthOk", testLengthOk),
 		("testNullOk", testNullOk),
