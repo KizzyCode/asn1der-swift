@@ -15,7 +15,7 @@ final public class DERSequenceIterator {
 	}
 	
 	/// Returns the next element as `T`
-	public func next<T: DERObject>() throws -> T {
+	public func next<T: DERObject>(type: T.Type = T.self) throws -> T {
 		guard let next = self.next() else {
 			throw DERError.invalidData("Not enough elements in sequence")
 		}
