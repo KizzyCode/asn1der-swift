@@ -15,7 +15,7 @@ public enum DERError: Error {
 
 
 /// A typed DER object
-public protocol DERObject {
+public protocol DERTyped {
     /// Inits `Self` with `object`
     ///
     ///  - Parameter object: The untyped object to decode
@@ -45,7 +45,7 @@ public protocol DERObject {
     ///  - Returns: The encoded object
     func encode() -> Data
 }
-public extension DERObject {
+public extension DERTyped {
     init<D: DataProtocol>(decode data: D) throws {
         var data = Data(data)
         try self.init(decode: &data)
@@ -79,7 +79,7 @@ final public class DERAny {
         self.value = Data(value)
     }
 }
-extension DERAny: DERObject {
+extension DERAny: DERTyped {
     public convenience init(with object: DERAny) {
         self.init(tag: object.tag, value: object.value)
     }

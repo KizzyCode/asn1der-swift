@@ -18,7 +18,7 @@ public class BoxedInt {
 /// A DER sequence walker
 private struct SequenceWalker<Key> {
     let decoder: RealDERDecoder
-    let objects: [DERObject]
+    let objects: [DERTyped]
     var position = BoxedInt()
     
     func superDecoder() throws -> Decoder {
@@ -158,7 +158,7 @@ extension SingleValueDecoder: SingleValueDecodingContainer {
     func decodeNil() -> Bool {
         (try? DERNull(with: self.object)) != nil
     }
-    func decode<T: Decodable & DERObject>(_ type: T.Type) throws -> T {
+    func decode<T: Decodable & DERTyped>(_ type: T.Type) throws -> T {
         try T(with: self.object)
     }
     func decode<T: Decodable>(_ type: T.Type) throws -> T {

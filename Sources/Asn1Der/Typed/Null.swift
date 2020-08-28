@@ -2,7 +2,7 @@ import Foundation
 
 
 /// A DER null object
-final public class DERNull: DERObject {
+final public class DERNull: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x05
 
@@ -23,7 +23,7 @@ final public class DERNull: DERObject {
 }
 
 
-extension Optional: DERObject where Wrapped: DERObject {
+extension Optional: DERTyped where Wrapped: DERTyped {
     public init(with object: DERAny) throws {
         switch object.tag {
             case DERNull.tag:

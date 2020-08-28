@@ -27,7 +27,7 @@ final public class DERSequenceIterator {
     ///  - Throws:
     ///     - `DERError.other` if the iterator is exhaustet
     ///     - `DERError` if the next element cannot be decoded as `T`
-    public func next<T: DERObject>(type: T.Type = T.self) throws -> T {
+    public func next<T: DERTyped>(type: T.Type = T.self) throws -> T {
         guard let next = self.next() else {
             throw DERError.other("The iterator is exhaustet")
         }
@@ -35,9 +35,9 @@ final public class DERSequenceIterator {
     }
 }
 extension DERSequenceIterator: IteratorProtocol {
-    public typealias Element = DERObject
+    public typealias Element = DERTyped
     
-    public func next() -> DERObject? {
+    public func next() -> DERTyped? {
         switch self.remaining {
             case 0:
                 return nil
@@ -50,17 +50,17 @@ extension DERSequenceIterator: IteratorProtocol {
 
 
 /// A DER sequence object
-final public class DERSequence: DERObject {
+final public class DERSequence: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x30
     
     /// The elements in the sequence
-    public var value: [DERObject]
+    public var value: [DERTyped]
     
     /// Initializes the DER sequence with `elements`
     ///
     ///  - Parameter elements: The elements to initialize the sequence with
-    public init(_ elements: [DERObject] = []) {
+    public init(_ elements: [DERTyped] = []) {
         self.value = elements
     }
     public init(with object: DERAny) throws {
@@ -69,7 +69,7 @@ final public class DERSequence: DERObject {
         }
         
         // Create array and counting source
-        var value: [DERObject] = []
+        var value: [DERTyped] = []
         var source = object.value
         
         // Read elements as long as the source is not empty
@@ -94,7 +94,7 @@ final public class DERSequence: DERObject {
 }
 
 
-extension Array: DERObject where Element: DERObject {
+extension Array: DERTyped where Element: DERTyped {
     public init(with object: DERAny) throws {
         let sequence = try DERSequence(with: object)
         self = try sequence.value.map({ try Element(with: $0.object()) })

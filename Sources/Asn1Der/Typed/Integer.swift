@@ -2,7 +2,7 @@ import Foundation
 
 
 /// A DER integer object
-final public class DERInteger: DERObject {
+final public class DERInteger: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x02
 
@@ -76,8 +76,8 @@ public extension BinaryInteger where Self: FixedWidthInteger, Self: UnsignedInte
 
 
 // Implement DER coding protocols for common unsigned integer types
-extension UInt: DERObject {}
-extension UInt8: DERObject {}
-extension UInt16: DERObject {}
-extension UInt32: DERObject {}
-extension UInt64: DERObject {}
+extension UInt: DERTyped {}
+extension UInt8: DERTyped {}
+extension UInt16: DERTyped {}
+extension UInt32: DERTyped {}
+extension UInt64: DERTyped {}

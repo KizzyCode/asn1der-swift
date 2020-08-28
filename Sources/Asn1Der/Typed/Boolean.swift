@@ -2,7 +2,7 @@ import Foundation
 
 
 /// A DER boolean object
-final public class DERBoolean: DERObject {
+final public class DERBoolean: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x01
     
@@ -35,7 +35,7 @@ final public class DERBoolean: DERObject {
 }
 
 
-extension Bool: DERObject {
+extension Bool: DERTyped {
     public init(with object: DERAny) throws {
         self = try DERBoolean(with: object).value
     }

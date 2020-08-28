@@ -38,7 +38,7 @@ final class Asn1DerTestOk: XCTestCase {
     }
     
     func testIntegerOk() throws {
-        func testNative<T: DERObject & UnsignedInteger>(_ type: T.Type, _ test: TestVectors.Ok.TypedInteger) throws {
+        func testNative<T: DERTyped & UnsignedInteger>(_ type: T.Type, _ test: TestVectors.Ok.TypedInteger) throws {
             if let uint = test.uint.map({ T(exactly: $0) }) as? T {
                 let native = try T(decode: test.bytes)
                 XCTAssertEqual(native, uint, "@\"\(test.name)\"")

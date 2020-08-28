@@ -33,7 +33,7 @@ final class Asn1DerTestErr: XCTestCase {
     }
     
     func testIntegerErr() {
-        func testNative<T: DERObject & FixedWidthInteger>(_ type: T.Type, _ test: TestVectors.Err.TypedAny) {
+        func testNative<T: DERTyped & FixedWidthInteger>(_ type: T.Type, _ test: TestVectors.Err.TypedAny) {
             XCTAssertThrowsError(try T(decode: test.bytes), "@\"\(test.name)\"", {
                 XCTAssertEqual($0.kind, test.err, "@\"\(test.name)\"")
             })

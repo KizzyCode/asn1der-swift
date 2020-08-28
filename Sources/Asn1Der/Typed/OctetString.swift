@@ -2,7 +2,7 @@ import Foundation
 
 
 /// A DER octet string object
-final public class DEROctetString: DERObject {
+final public class DEROctetString: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x04
 
@@ -28,7 +28,7 @@ final public class DEROctetString: DERObject {
 }
 
 
-extension Data: DERObject {
+extension Data: DERTyped {
     public init(with object: DERAny) throws {
         self = try DEROctetString(with: object).value
     }

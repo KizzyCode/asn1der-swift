@@ -2,17 +2,17 @@ import Foundation
 
 
 /// A generic top-level object
-private class GenericObject: DERObject {
+private class GenericObject: DERTyped {
     /// The wrapped object
-    private var _wrapped: DERObject!
+    private var _wrapped: DERTyped!
     /// The wrapped object
-    public var wrapped: DERObject {
+    public var wrapped: DERTyped {
         get { self._wrapped! }
         set { self._wrapped = newValue }
     }
     
     /// Accesses the wrapped object as sequence
-    public var sequence: [DERObject] {
+    public var sequence: [DERTyped] {
         get { (self._wrapped! as! DERSequence).value }
         set { self._wrapped = DERSequence(newValue) }
     }
@@ -26,7 +26,7 @@ private class GenericObject: DERObject {
     /// Creates a new top-level object by wrapping `object`
     ///
     ///  - Parameter object: The object to wrap
-    required public init(wrapping object: DERObject! = nil) {
+    required public init(wrapping object: DERTyped! = nil) {
         self._wrapped = object
     }
     
@@ -255,7 +255,7 @@ extension SingleValueEncoder: SingleValueEncodingContainer {
     func encodeNil() throws {
         self.object.wrapped = DERNull()
     }
-    func encode<T: Encodable & DERObject>(_ value: T) throws {
+    func encode<T: Encodable & DERTyped>(_ value: T) throws {
         self.object.wrapped = value
     }
     func encode<T: Encodable>(_ value: T) throws {
