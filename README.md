@@ -38,15 +38,20 @@ let reencodedInt = uint.encode()
 XCTAssertEqual(reencodedInt, encodedInt)
 
 
-// Decode a `RawRepresentable` and DER codable enum
-enum TestEnum: String, DERObject {
-	case variantA = "Variant A", variantB = "Variant B"
+// Decode a `RawRepresentable` enum
+// swiftlint:disable nesting
+enum TestEnum: String, Codable {
+    case variantA = "Variant A", variantB = "Variant B"
 }
 let encodedTestEnum = Data([0x0c, 0x09, 0x56, 0x61, 0x72, 0x69, 0x61, 0x6E, 0x74, 0x20, 0x41])
 
 // Decode the enum
-let testEnum: TestEnum = try TestEnum(decode: encodedTestEnum)
+let testEnum: TestEnum = try DERDecoder().decode(data: encodedTestEnum)
 XCTAssertEqual(testEnum, .variantA)
+
+// Reencode the enum
+let reencodedTestEnum = try DEREncoder().encode(testEnum)
+XCTAssertEqual(reencodedTestEnum, encodedTestEnum)
 ```
 
 
