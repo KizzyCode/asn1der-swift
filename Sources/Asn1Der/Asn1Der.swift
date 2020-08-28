@@ -17,39 +17,50 @@ public enum DERError: Error {
 /// A typed DER object
 public protocol DERObject {
 	/// Inits `Self` with `object`
+    ///
+    ///  - Parameter object: The untyped object to decode
+    ///  - Throws: `DERError` in case of decoding errors
 	init(with object: DERAny) throws
 	/// DER decodes `Self` from `data`
+    ///
+    ///  - Parameter data: The bytes to decode
+    ///  - Throws: `DERError` in case of decoding errors
 	init<D: DataProtocol>(decode data: D) throws
-	/// DER decodes `Self` from `source` if the total encoded size of `self` does not exceed limit
+	/// DER decodes `Self` from `data` and removes the decoded bytes
+    ///
+    ///  - Parameter data: The data to decode
+    ///  - Throws: `DERError` in case of decoding errors
 	init(decode data: inout Data) throws
 	
 	/// Creates an untyped/generic DER object from `self`
+    ///
+    ///  - Returns: `self` as untyped object
 	func object() -> DERAny
 	/// DER encodes `self` to `data`
-	func encode(to data: inout Data) throws
+    ///
+    ///  - Parameter data: The data object to write the encoded object to
+	func encode(to data: inout Data)
 	/// DER encodes `self`
+    ///
+    ///  - Returns: The encoded object
 	func encode() -> Data
 }
 public extension DERObject {
-	/// DER decodes `Self` from `data`
 	init<D: DataProtocol>(decode data: D) throws {
 		var data = Data(data)
         try self.init(decode: &data)
 	}
-	/// DER decodes `Self` from `source` if the total encoded size of `self` does not exceed limit
 	init(decode data: inout Data) throws {
 		let object = try DERAny(decode: data)
 		try self.init(with: object)
 	}
 	
-	/// DER encodes `self` to `data`
-	func encode(to data: inout Data) throws {
+	func encode(to data: inout Data) {
 		self.object().encode(to: &data)
 	}
-	/// DER encodes `self`
 	func encode() -> Data {
 		var data = Data()
-		try! self.encode(to: &data)
+		self.encode(to: &data)
 		return data
 	}
 }

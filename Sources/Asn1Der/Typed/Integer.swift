@@ -12,15 +12,20 @@ final public class DERInteger: DERObject {
 	public var isNegative: Bool { self.raw[0] & 0b1000_0000 != 0 }
 	/// The number bytes without leading zero bytes
 	///
-	///  - Important: since any leading zero-byte that might indicate a positive number is stripped off, a return value
-	///    of e.g. `0b1111_1111` can be either `255` or `-1` depending on whether the number is negative or not. Use
+	///  - Warning: since any leading zero-byte that might indicate a positive number is stripped off, a return value of
+    ///    e.g. `0b1111_1111` can be either `255` or `-1` depending on whether the number is negative or not. Use
 	///    `isNegative` to determine the correct sign.
 	public var bigEndianBytes: Data { self.raw.drop(while: { $0 == 0 }) }
 	
 	/// Creates a new integer object with the big-endian encoded `numBytesBE`
-	public init(numBytesBE: Data, isNegative: Bool) {
+    ///
+    ///  - Parameters:
+    ///     - bigEndianBytes: The raw big-endian encoded number bytes
+    ///     - isNegative: A flag indicating whether `bigEndianBytes` represents a negative value or not (this is
+    ///       necessary to prepend a leading zero byte in case the number is positive but the first bit is set)
+	public init(bigEndianBytes: Data, isNegative: Bool) {
 		// Remove all leading zero bytes and re-add a leading zero byte if necessary
-		switch numBytesBE.drop(while: { $0 == 0 }) {
+		switch bigEndianBytes.drop(while: { $0 == 0 }) {
 			case let raw where raw.isEmpty:
 				self.raw = Data([0x00])
 			case let raw where raw[0] & 0b1000_0000 != 0 && !isNegative:
@@ -55,7 +60,6 @@ final public class DERInteger: DERObject {
 
 // Implement DER coding for any binary Integer
 public extension BinaryInteger where Self: FixedWidthInteger, Self: UnsignedInteger {
-	/// Initializes `self` from a DER object
 	init(with object: DERAny) throws {
 		switch try DERInteger(with: object) {
 			case let integer where integer.isNegative:
@@ -65,14 +69,13 @@ public extension BinaryInteger where Self: FixedWidthInteger, Self: UnsignedInte
 		}
 	}
 	
-	/// Creates a `DERObject` from `self`
 	func object() -> DERAny {
-		DERInteger(numBytesBE: self.bigEndianBytes, isNegative: false).object()
+        DERInteger(bigEndianBytes: self.bigEndianBytes, isNegative: self < 0).object()
 	}
 }
 
 
-// Implement DER coding protocols for common integer types
+// Implement DER coding protocols for common unsigned integer types
 extension UInt: DERObject {}
 extension UInt8: DERObject {}
 extension UInt16: DERObject {}

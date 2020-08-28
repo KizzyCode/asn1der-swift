@@ -7,6 +7,8 @@ public class BoxedInt {
     public var value: Int
     
     /// Initializes the boxed integer with `value`
+    ///
+    ///  - Parameter value: The integer to box
     public init(_ value: Int = 0) {
         self.value = value
     }
@@ -19,16 +21,15 @@ private struct SequenceWalker<Key> {
 	let objects: [DERObject]
 	var position = BoxedInt()
 	
-    public init(decoder: RealDERDecoder, objects: [DERObject] = []) {
-        self.decoder = decoder
-        self.objects = objects
-    }
-    
 	func superDecoder() throws -> Decoder {
 		self.decoder
 	}
 	
 	/// Returns the next object in the sequence
+    ///
+    ///  - Parameter key: The associated key (used to generate better errors)
+    ///  - Returns: The decoded object
+    ///  - Throws: `DERError.invalidData` if there are no fields left to decode
     func next(_ key: String? = nil) throws -> DERAny {
 		switch self.isAtEnd {
 			case false:
@@ -166,14 +167,41 @@ extension SingleValueDecoder: SingleValueDecodingContainer {
 }
 
 
+/// The real decoder
+private struct RealDERDecoder {
+    public let object: DERAny
+}
+extension RealDERDecoder: Decoder {
+    public var codingPath: [CodingKey] { [] }
+    public var userInfo: [CodingUserInfoKey: Any] { [:] }
+    
+    public func container<Key: CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {
+        let sequence = try DERSequence(with: self.object)
+        return KeyedDecodingContainer(SequenceWalker<Key>(decoder: self, objects: sequence.value))
+    }
+    public func unkeyedContainer() throws -> UnkeyedDecodingContainer {
+        switch self.object.tag {
+            case DEROctetString.tag:
+                let octetString = try DEROctetString(with: self.object)
+                return DataWalker(decoder: self, data: octetString.value)
+            default:
+                let sequence = try DERSequence(with: self.object)
+                return SequenceWalker<Void>(decoder: self, objects: sequence.value)
+        }
+    }
+    public func singleValueContainer() throws -> SingleValueDecodingContainer {
+        SingleValueDecoder(object: self.object)
+    }
+}
+
+
+
 /// A DER decoder
 public class DERDecoder {
 	/// The decoder options
 	public struct Options: OptionSet {
-		/// The raw value
 		public var rawValue: UInt
 		
-		/// Creates a new decoder option set
 		public init(rawValue: RawValue = 0) {
 			self.rawValue = rawValue
 		}
@@ -186,11 +214,19 @@ public class DERDecoder {
 	public let options: Options
 	
 	/// Creates a new `DERDecoder`
+    ///
+    ///  - Parameter options: The decoder options to use
 	public init(options: Options = Options()) {
 		self.options = options
 	}
 	
 	/// DER decodes an object of type `T` from `data`
+    ///
+    ///  - Parameters:
+    ///     - type: The type to decode
+    ///     - data: The data to decode
+    ///  - Returns: The decoded object
+    ///  - Throws: `DERError` in case of decoding errors
 	public func decode<T: Decodable, D: DataProtocol>(_ type: T.Type = T.self, data: D) throws -> T {
         // Decode object
         var data = Data(data)
@@ -204,33 +240,5 @@ public class DERDecoder {
         // Create decoder
         let decoder = RealDERDecoder(object: object)
 		return try T(from: decoder)
-	}
-}
-
-
-/// The real decoder
-private struct RealDERDecoder {
-	public let object: DERAny
-}
-extension RealDERDecoder: Decoder {
-	public var codingPath: [CodingKey] { [] }
-	public var userInfo: [CodingUserInfoKey: Any] { [:] }
-	
-    public func container<Key: CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {
-		let sequence = try DERSequence(with: self.object)
-		return KeyedDecodingContainer(SequenceWalker<Key>(decoder: self, objects: sequence.value))
-	}
-	public func unkeyedContainer() throws -> UnkeyedDecodingContainer {
-		switch self.object.tag {
-			case DEROctetString.tag:
-				let octetString = try DEROctetString(with: self.object)
-				return DataWalker(decoder: self, data: octetString.value)
-			default:
-				let sequence = try DERSequence(with: self.object)
-				return SequenceWalker<Void>(decoder: self, objects: sequence.value)
-		}
-	}
-	public func singleValueContainer() throws -> SingleValueDecodingContainer {
-		SingleValueDecoder(object: self.object)
 	}
 }

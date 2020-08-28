@@ -24,6 +24,8 @@ private class GenericObject: DERObject {
     }
     
     /// Creates a new top-level object by wrapping `object`
+    ///
+    ///  - Parameter object: The object to wrap
     required public init(wrapping object: DERObject! = nil) {
         self._wrapped = object
     }
@@ -44,6 +46,9 @@ private struct SequenceBuilder<Key> {
     var object: GenericObject
     
     /// Encodes any value
+    ///
+    ///  - Parameter value: The value to encode
+    ///  - Throws: `DERError.unsupported` if `value` or a subfield is not supported by the encoder
     private func encodeAny<T: Encodable>(_ value: T?) throws {
         if let value = value {
         	let encoder = RealDEREncoder(type: T.self)
@@ -259,20 +264,6 @@ extension SingleValueEncoder: SingleValueEncodingContainer {
 }
 
 
-/// A DER encoder
-public class DEREncoder {
-    /// Creates a new DER encoder instance
-    public init() {}
-    
-    /// Encodes `value`
-    public func encode<T: Encodable>(_ value: T) throws -> Data {
-        let encoder = RealDEREncoder(type: T.self)
-        try value.encode(to: encoder)
-        return encoder.topLevel.encode()
-    }
-}
-
-
 /// The real encoder
 private struct RealDEREncoder {
     public let type: Any.Type
@@ -297,5 +288,22 @@ extension RealDEREncoder: Encoder {
     }
     public func singleValueContainer() -> SingleValueEncodingContainer {
         SingleValueEncoder(object: self.topLevel)
+    }
+}
+
+
+/// A DER encoder
+public class DEREncoder {
+    /// Creates a new DER encoder instance
+    public init() {}
+    
+    /// Encodes `value`
+    ///
+    ///  - Parameter value: The value to DER encode
+    ///  - Throws: `DERError.unsupported` if `value` or a subfield is not supported by the encoder
+    public func encode<T: Encodable>(_ value: T) throws -> Data {
+        let encoder = RealDEREncoder(type: T.self)
+        try value.encode(to: encoder)
+        return encoder.topLevel.encode()
     }
 }

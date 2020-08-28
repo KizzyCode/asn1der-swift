@@ -10,6 +10,8 @@ final public class DERBoolean: DERObject {
 	public var value: Bool
 
 	/// Initializes the DER boolean with `value`
+    ///
+    ///  - Parameter value: The value to initialize the boolean with
 	public init(_ value: Bool) {
 		self.value = value
 	}
