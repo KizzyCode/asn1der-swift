@@ -195,7 +195,6 @@ extension RealDERDecoder: Decoder {
 }
 
 
-
 /// A DER decoder
 public class DERDecoder {
 	/// The decoder options
