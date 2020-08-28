@@ -3,39 +3,39 @@ import Foundation
 
 // Implement big-endian byte coding methods for unsigned integers
 internal extension BinaryInteger where Self: FixedWidthInteger, Self: UnsignedInteger {
-	/// The byte width of `Self`
-	static var byteWidth: Int { Self.bitWidth / 8 }
+    /// The byte width of `Self`
+    static var byteWidth: Int { Self.bitWidth / 8 }
 
-	/// The big-endian encoded bytes of `Self` (leading zero-bytes are truncated)
-	var bigEndianBytes: Data {
-		// Compute the amount of bytes to skip and capture value
-		let skip = self.leadingZeroBitCount / 8
-		var num = self
-		
-		// Encode the number
-		let bytes: [UInt8] = (0 ..< Self.byteWidth - skip).map({ _ in
-			defer { num >>= 8 }
-			return UInt8(truncatingIfNeeded: num)
-		})
-		return Data(bytes.reversed())
-	}
+    /// The big-endian encoded bytes of `Self` (leading zero-bytes are truncated)
+    var bigEndianBytes: Data {
+        // Compute the amount of bytes to skip and capture value
+        let skip = self.leadingZeroBitCount / 8
+        var num = self
+        
+        // Encode the number
+        let bytes: [UInt8] = (0 ..< Self.byteWidth - skip).map({ _ in
+            defer { num >>= 8 }
+            return UInt8(truncatingIfNeeded: num)
+        })
+        return Data(bytes.reversed())
+    }
 
-	/// Inits `Self` with up to `Self.byteWidth` big-endian bytes
+    /// Inits `Self` with up to `Self.byteWidth` big-endian bytes
     ///
     ///  - Parameter bytes: The big-endian encoded bytes
     ///  - Throws: `DERError.unsupported` if the width of `self` is too small
-	init<D: DataProtocol>(bigEndianBytes bytes: D) throws {
-		// Validate that the number can fit
-		guard bytes.count <= Self.byteWidth else {
-			throw DERError.unsupported("Cannot decode integer because the target type is too small")
-		}
-		
-		// Decode the number
-		self = bytes.reduce(into: Self.zero, {
-			$0 <<= 8
-			$0 |= Self(exactly: $1)!
-		})
-	}
+    init<D: DataProtocol>(bigEndianBytes bytes: D) throws {
+        // Validate that the number can fit
+        guard bytes.count <= Self.byteWidth else {
+            throw DERError.unsupported("Cannot decode integer because the target type is too small")
+        }
+        
+        // Decode the number
+        self = bytes.reduce(into: Self.zero, {
+            $0 <<= 8
+            $0 |= Self(exactly: $1)!
+        })
+    }
 }
 
 

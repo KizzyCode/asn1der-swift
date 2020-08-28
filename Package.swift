@@ -4,18 +4,18 @@
 import PackageDescription
 
 let package = Package(
-	name: "Asn1Der",
-	products: [
-		.library(
-			name: "Asn1Der",
-			targets: ["Asn1Der"])
-	],
-	targets: [
-		.target(
-			name: "Asn1Der",
-			dependencies: []),
-		.testTarget(
-			name: "Asn1DerTests",
-			dependencies: ["Asn1Der"])
-	]
+    name: "Asn1Der",
+    products: [
+        .library(
+            name: "Asn1Der",
+            targets: ["Asn1Der"])
+    ],
+    targets: [
+        .target(
+            name: "Asn1Der",
+            dependencies: []),
+        .testTarget(
+            name: "Asn1DerTests",
+            dependencies: ["Asn1Der"])
+    ]
 )

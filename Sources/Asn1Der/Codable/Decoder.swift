@@ -17,28 +17,28 @@ public class BoxedInt {
 
 /// A DER sequence walker
 private struct SequenceWalker<Key> {
-	let decoder: RealDERDecoder
-	let objects: [DERObject]
-	var position = BoxedInt()
-	
-	func superDecoder() throws -> Decoder {
-		self.decoder
-	}
-	
-	/// Returns the next object in the sequence
+    let decoder: RealDERDecoder
+    let objects: [DERObject]
+    var position = BoxedInt()
+    
+    func superDecoder() throws -> Decoder {
+        self.decoder
+    }
+    
+    /// Returns the next object in the sequence
     ///
     ///  - Parameter key: The associated key (used to generate better errors)
     ///  - Returns: The decoded object
     ///  - Throws: `DERError.invalidData` if there are no fields left to decode
     func next(_ key: String? = nil) throws -> DERAny {
-		switch self.isAtEnd {
-			case false:
+        switch self.isAtEnd {
+            case false:
                 defer { self.position.value += 1 }
-				return self.objects[self.currentIndex].object()
-			default:
-				throw DERError.invalidData("The DER sequence has no field left to decode key \"\(key ?? "<unkeyed>")\"")
-		}
-	}
+                return self.objects[self.currentIndex].object()
+            default:
+                throw DERError.invalidData("The DER sequence has no field left to decode key \"\(key ?? "<unkeyed>")\"")
+        }
+    }
 }
 extension SequenceWalker: KeyedDecodingContainerProtocol where Key: CodingKey {
     var codingPath: [CodingKey] { [] }
@@ -51,29 +51,29 @@ extension SequenceWalker: KeyedDecodingContainerProtocol where Key: CodingKey {
             self.position.value -= 1
         }
         return isNil
-	}
+    }
     func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
-		let decoder = RealDERDecoder(object: try self.next(key.stringValue))
-		return try T(from: decoder)
-	}
-	
+        let decoder = RealDERDecoder(object: try self.next(key.stringValue))
+        return try T(from: decoder)
+    }
+    
     func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws
     -> KeyedDecodingContainer<NestedKey> {
-		let sequence = try DERSequence(with: try self.next(key.stringValue))
-		return KeyedDecodingContainer(SequenceWalker<NestedKey>(decoder: self.decoder, objects: sequence.value))
-	}
+        let sequence = try DERSequence(with: try self.next(key.stringValue))
+        return KeyedDecodingContainer(SequenceWalker<NestedKey>(decoder: self.decoder, objects: sequence.value))
+    }
     func nestedUnkeyedContainer(forKey key: Key) throws -> UnkeyedDecodingContainer {
-		let sequence = try DERSequence(with: try self.next(key.stringValue))
-		return SequenceWalker(decoder: self.decoder, objects: sequence.value)
-	}
-	
-	func contains(_ key: Key) -> Bool {
-		true
-	}
-	
-	func superDecoder(forKey key: Key) throws -> Decoder {
-		self.decoder
-	}
+        let sequence = try DERSequence(with: try self.next(key.stringValue))
+        return SequenceWalker(decoder: self.decoder, objects: sequence.value)
+    }
+    
+    func contains(_ key: Key) -> Bool {
+        true
+    }
+    
+    func superDecoder(forKey key: Key) throws -> Decoder {
+        self.decoder
+    }
 }
 extension SequenceWalker: UnkeyedDecodingContainer {
     var codingPath: [CodingKey] { [] }
@@ -88,29 +88,29 @@ extension SequenceWalker: UnkeyedDecodingContainer {
             self.position.value -= 1
         }
         return isNil
-	}
+    }
     func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
-		let decoder = RealDERDecoder(object: try self.next())
-		return try T(from: decoder)
-	}
-	
+        let decoder = RealDERDecoder(object: try self.next())
+        return try T(from: decoder)
+    }
+    
     func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type) throws
     -> KeyedDecodingContainer<NestedKey> {
-		let sequence = try DERSequence(with: try self.next())
-		return KeyedDecodingContainer(SequenceWalker<NestedKey>(decoder: self.decoder, objects: sequence.value))
-	}
+        let sequence = try DERSequence(with: try self.next())
+        return KeyedDecodingContainer(SequenceWalker<NestedKey>(decoder: self.decoder, objects: sequence.value))
+    }
     func nestedUnkeyedContainer() throws -> UnkeyedDecodingContainer {
-		let sequence = try DERSequence(with: try self.next())
-		return SequenceWalker(decoder: self.decoder, objects: sequence.value)
-	}
+        let sequence = try DERSequence(with: try self.next())
+        return SequenceWalker(decoder: self.decoder, objects: sequence.value)
+    }
 }
 
 
 /// A DER data walker
 private struct DataWalker {
-	let decoder: RealDERDecoder
-	let data: Data
-	var position = BoxedInt()
+    let decoder: RealDERDecoder
+    let data: Data
+    var position = BoxedInt()
 }
 extension DataWalker: UnkeyedDecodingContainer {
     var currentIndex: Int { self.position.value }
@@ -150,7 +150,7 @@ extension DataWalker: UnkeyedDecodingContainer {
 
 /// A single value decoder
 private struct SingleValueDecoder {
-	let object: DERAny
+    let object: DERAny
 }
 extension SingleValueDecoder: SingleValueDecodingContainer {
     var codingPath: [CodingKey] { [] }
@@ -197,36 +197,36 @@ extension RealDERDecoder: Decoder {
 
 /// A DER decoder
 public class DERDecoder {
-	/// The decoder options
-	public struct Options: OptionSet {
-		public var rawValue: UInt
-		
-		public init(rawValue: RawValue = 0) {
-			self.rawValue = rawValue
-		}
-		
-		/// Allows trailing bytes after decoding the first top-level object
-		public static let allowTrailingBytes = Self(rawValue: 1 << 0)
-	}
-	
-	/// The decoder options for this instance
-	public let options: Options
-	
-	/// Creates a new `DERDecoder`
+    /// The decoder options
+    public struct Options: OptionSet {
+        public var rawValue: UInt
+        
+        public init(rawValue: RawValue = 0) {
+            self.rawValue = rawValue
+        }
+        
+        /// Allows trailing bytes after decoding the first top-level object
+        public static let allowTrailingBytes = Self(rawValue: 1 << 0)
+    }
+    
+    /// The decoder options for this instance
+    public let options: Options
+    
+    /// Creates a new `DERDecoder`
     ///
     ///  - Parameter options: The decoder options to use
-	public init(options: Options = Options()) {
-		self.options = options
-	}
-	
-	/// DER decodes an object of type `T` from `data`
+    public init(options: Options = Options()) {
+        self.options = options
+    }
+    
+    /// DER decodes an object of type `T` from `data`
     ///
     ///  - Parameters:
     ///     - type: The type to decode
     ///     - data: The data to decode
     ///  - Returns: The decoded object
     ///  - Throws: `DERError` in case of decoding errors
-	public func decode<T: Decodable, D: DataProtocol>(_ type: T.Type = T.self, data: D) throws -> T {
+    public func decode<T: Decodable, D: DataProtocol>(_ type: T.Type = T.self, data: D) throws -> T {
         // Decode object
         var data = Data(data)
         let object = try DERAny(decode: &data)
@@ -238,6 +238,6 @@ public class DERDecoder {
         
         // Create decoder
         let decoder = RealDERDecoder(object: object)
-		return try T(from: decoder)
-	}
+        return try T(from: decoder)
+    }
 }

@@ -51,9 +51,9 @@ private struct SequenceBuilder<Key> {
     ///  - Throws: `DERError.unsupported` if `value` or a subfield is not supported by the encoder
     private func encodeAny<T: Encodable>(_ value: T?) throws {
         if let value = value {
-        	let encoder = RealDEREncoder(type: T.self)
-        	try value.encode(to: encoder)
-        	self.object.sequence.append(encoder.topLevel.object())
+            let encoder = RealDEREncoder(type: T.self)
+            try value.encode(to: encoder)
+            self.object.sequence.append(encoder.topLevel.object())
         } else {
             self.object.sequence.append(DERNull())
         }
