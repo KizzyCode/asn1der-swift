@@ -9,7 +9,6 @@ final public class DERUTF8String: DERObject {
 	/// The string value
 	public let value: String
 
-
 	/// Initializes the DER UTF-8 string with `string`
 	public init(_ string: String) {
 		self.value = string

@@ -12,11 +12,10 @@ final public class DERInteger: DERObject {
 	public var isNegative: Bool { self.raw[0] & 0b1000_0000 != 0 }
 	/// The number bytes without leading zero bytes
 	///
-	/// __Important: since any leading zero-byte that might indicate a positive number is stripped
-	/// off, a return value of e.g. `0b1111_1111` can be either `255` or `-1` depending on whether
-	/// the number is negative or not. Use `is_negative` to determine the correct sign.__
+	///  - Important: since any leading zero-byte that might indicate a positive number is stripped off, a return value
+	///    of e.g. `0b1111_1111` can be either `255` or `-1` depending on whether the number is negative or not. Use
+	///    `isNegative` to determine the correct sign.
 	public var bigEndianBytes: Data { self.raw.drop(while: { $0 == 0 }) }
-	
 	
 	/// Creates a new integer object with the big-endian encoded `numBytesBE`
 	public init(numBytesBE: Data, isNegative: Bool) {
@@ -37,11 +36,11 @@ final public class DERInteger: DERObject {
 		
 		// Validate the number
 		switch object.value {
-			case let v where v.isEmpty:
+			case let value where value.isEmpty:
 				throw DERError.invalidData("Object is not a valid integer")
-			case let v where v.count > 1 && v[0] == 0x00 && v[1] & 0b1000_0000 == 0:
+			case let value where value.count > 1 && value[0] == 0x00 && value[1] & 0b1000_0000 == 0:
 				throw DERError.invalidData("Object is not a valid integer")
-			case let v where v.count > 1 && v[0] == 0xff && v[1] & 0b1000_0000 != 0:
+			case let value where value.count > 1 && value[0] == 0xff && value[1] & 0b1000_0000 != 0:
 				throw DERError.invalidData("Object is not a valid integer")
 			case let value:
 				self.raw = value

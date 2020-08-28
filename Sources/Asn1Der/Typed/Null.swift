@@ -6,7 +6,6 @@ final public class DERNull: DERObject {
 	/// The associated DER tag
 	public static let tag: UInt8 = 0x05
 
-
 	/// Initializes the DER null object
 	public init() {}
 	public init(with object: DERAny) throws {
@@ -28,7 +27,7 @@ extension Optional: DERObject where Wrapped: DERObject {
 	public init(with object: DERAny) throws {
 		switch object.tag {
 			case DERNull.tag:
-				let _ = try DERNull(with: object)
+				_ = try DERNull(with: object)
 				self = .none
 			default:
 				let wrapped = try Wrapped(with: object)

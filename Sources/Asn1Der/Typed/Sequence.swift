@@ -30,7 +30,7 @@ extension DERSequenceIterator: IteratorProtocol {
 			case 0:
 				return nil
 			default:
-				defer{ self.position += 1 }
+				defer { self.position += 1 }
 				return self.sequence.value[self.position]
 		}
 	}
@@ -44,7 +44,6 @@ final public class DERSequence: DERObject {
 	
 	/// The subobjects
 	public var value: [DERObject]
-	
 	
 	/// Initializes the DER sequence with `subobjects`
 	public init(_ subobjects: [DERObject] = []) {
@@ -61,7 +60,7 @@ final public class DERSequence: DERObject {
 		
 		// Read elements as long as the source is not empty
 		while !source.isEmpty {
-			value.append(try DERAny(decode: { try source.read() }, limit: Int.max))
+			value.append(try DERAny(decode: &source))
 		}
 		self.value = value
 	}

@@ -1,16 +1,16 @@
 import XCTest
 @testable import Asn1Der
 
+
 final class Asn1DerTestErr: XCTestCase {
 	func testLengthErr() {
 		for test in TestVectors.Err.tests.length {
 			var source = Data(test.bytes)
-			XCTAssertThrowsError(try Int(decodeLength: { try source.read() }), "@\"\(test.name)\"", {
+            XCTAssertThrowsError(try Int(derLength: &source), "@\"\(test.name)\"", {
 				XCTAssertEqual($0.kind, test.err, "@\"\(test.name)\"")
 			})
 		}
 	}
-
 	
 	func testObjectErr() {
 		for test in TestVectors.Err.tests.object {
@@ -19,7 +19,6 @@ final class Asn1DerTestErr: XCTestCase {
 			})
 		}
 	}
-
 	
 	func testBooleanErr() {
 		for test in TestVectors.Err.tests.typed.bool {
@@ -32,7 +31,6 @@ final class Asn1DerTestErr: XCTestCase {
 			})
 		}
 	}
-	
 	
 	func testIntegerErr() {
 		func testNative<T: DERObject & FixedWidthInteger>(_ type: T.Type, _ test: TestVectors.Err.TypedAny) {
@@ -54,7 +52,6 @@ final class Asn1DerTestErr: XCTestCase {
 		}
 	}
 	
-	
 	func testNullErr() {
 		for test in TestVectors.Err.tests.typed.null {
 			XCTAssertThrowsError(try DERNull(decode: test.bytes), "@\"\(test.name)\"", {
@@ -66,7 +63,6 @@ final class Asn1DerTestErr: XCTestCase {
 			})
 		}
 	}
-	
 	
 	func testOctetStringErr() {
 		for test in TestVectors.Err.tests.typed.octet_string {
@@ -80,7 +76,6 @@ final class Asn1DerTestErr: XCTestCase {
 		}
 	}
 	
-	
 	func testSequenceErr() {
 		for test in TestVectors.Err.tests.typed.sequence {
 			XCTAssertThrowsError(try DERSequence(decode: test.bytes), "@\"\(test.name)\"", {
@@ -93,7 +88,6 @@ final class Asn1DerTestErr: XCTestCase {
 		}
 	}
 
-
 	func testUTF8StringErr() {
 		for test in TestVectors.Err.tests.typed.utf8_string {
 			XCTAssertThrowsError(try DERUTF8String(decode: test.bytes), "@\"\(test.name)\"", {
@@ -105,7 +99,6 @@ final class Asn1DerTestErr: XCTestCase {
 			})
 		}
 	}
-
 
 	static var allTests = [
 		("testLengthErr", testLengthErr),

@@ -3,8 +3,6 @@ import Foundation
 
 /// A DER coding related error
 public enum DERError: Error {
-	/// An in-out error occurred (e.g. failed to read/write some bytes)
-	case inOutError(String, StaticString = #file, Int = #line)
 	/// The data has an invalid encoding
 	case invalidData(String, StaticString = #file, Int = #line)
 	/// The object type or length is not supported by this implementation
@@ -23,7 +21,7 @@ public protocol DERObject {
 	/// DER decodes `Self` from `data`
 	init<D: DataProtocol>(decode data: D) throws
 	/// DER decodes `Self` from `source` if the total encoded size of `self` does not exceed limit
-	init(decode source: @escaping () throws -> UInt8, limit: Int) throws
+	init(decode data: inout Data) throws
 	
 	/// Creates an untyped/generic DER object from `self`
 	func object() -> DERAny
@@ -36,11 +34,11 @@ public extension DERObject {
 	/// DER decodes `Self` from `data`
 	init<D: DataProtocol>(decode data: D) throws {
 		var data = Data(data)
-		try self.init(decode: { try data.read() }, limit: Int.max)
+        try self.init(decode: &data)
 	}
 	/// DER decodes `Self` from `source` if the total encoded size of `self` does not exceed limit
-	init(decode source: @escaping () throws -> UInt8, limit: Int) throws {
-		let object = try DERAny(decode: source, limit: limit)
+	init(decode data: inout Data) throws {
+		let object = try DERAny(decode: data)
 		try self.init(with: object)
 	}
 	
@@ -64,7 +62,6 @@ final public class DERAny {
 	/// The object value
 	public let value: Data
 	
-	
 	/// Creates a new DER object with `tag` and `value`
 	public init<D: DataProtocol>(tag: UInt8, value: D) {
 		self.tag = tag
@@ -75,28 +72,21 @@ extension DERAny: DERObject {
 	public convenience init(with object: DERAny) {
 		self.init(tag: object.tag, value: object.value)
 	}
-	public convenience init(decode nextByte: @escaping () throws -> UInt8, limit: Int) throws {
-		// Read tag
-		let tag = try nextByte()
-		
-		// Read length
-		var lengthSize = 0
-		let length = try Int(decodeLength: {
-			lengthSize += 1
-			return try nextByte()
-		})
-		
-		// Validate limit
-		guard let total = Int(checkedSum: 1, lengthSize, length) else {
-			throw DERError.unsupported("Cannot decode object because it's length would exceed `Int.max`")
-		}
-		guard total <= limit else {
-			throw DERError.other("Cannot decode object because it's length would exceed the given limit")
-		}
-		
+    public convenience init(decode data: inout Data) throws {
+		// Read tag and length
+        guard let tag = data.popFirst() else {
+            throw DERError.invalidData("DER object is truncated")
+        }
+        let length = try Int(derLength: &data)
+        
 		// Read value and create object
-		let value = try Data(from: nextByte, length: length)
-		self.init(tag: tag, value: value)
+        guard data.count >= length else {
+            throw DERError.invalidData("DER object is truncated")
+        }
+        let value = Data(data.prefix(length))
+        
+        data = Data(data.dropFirst(length))
+        self.init(tag: tag, value: value)
 	}
 	
 	public func object() -> DERAny {
@@ -104,8 +94,8 @@ extension DERAny: DERObject {
 	}
 	// "Override" the propagating default implementation with the real implementationb here
 	public func encode(to data: inout Data) {
-		data.write(self.tag)
-		data.writeLength(self.value.count)
-		data.write(self.value)
+        data.append(self.tag)
+        data.append(self.value.count.derLength)
+        data.append(self.value)
 	}
 }

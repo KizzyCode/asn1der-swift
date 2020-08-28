@@ -9,7 +9,6 @@ final public class DEROctetString: DERObject {
 	/// The data value
 	public var value: Data
 
-
 	/// Initializes the DER octet string with `data`
 	public init<D: DataProtocol>(_ data: D) {
 		self.value = Data(data)

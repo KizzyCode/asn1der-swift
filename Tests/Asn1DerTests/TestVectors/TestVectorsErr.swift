@@ -18,12 +18,12 @@ extension TestVectors.Err {
 		{
 		  "name": "Truncated length (expected 1, got 0)",
 		  "bytes": [129],
-		  "err": "InOutError"
+		  "err": "InvalidData"
 		},
 		{
 		  "name": "Truncated length (expected 4, got 3)",
 		  "bytes": [132,1,0,0],
-		  "err": "InOutError"
+		  "err": "InvalidData"
 		},
 		{
 		  "name": "Unsupported length > 2^64 - 1",
@@ -45,17 +45,17 @@ extension TestVectors.Err {
 		{
 		  "name": "Truncated object (expected 1, got 0)",
 		  "bytes": [190,129],
-		  "err": "InOutError"
+		  "err": "InvalidData"
 		},
 		{
 		  "name": "Truncated object (expected 4, got 3)",
 		  "bytes": [215,132,1,0,0],
-		  "err": "InOutError"
+		  "err": "InvalidData"
 		},
 		{
 		  "name": "Truncated object (expected 9, got 8)",
 		  "bytes": [12,9,84,101,115,116,111,108,111,112],
-		  "err": "InOutError"
+		  "err": "InvalidData"
 		},
 		{
 		  "name": "Truncated object (unsupported length > 2^64 - 1)",
@@ -65,12 +65,12 @@ extension TestVectors.Err {
 		{
 		  "name": "Truncated object (unsupported length > 2^64 - 1)",
 		  "bytes": [157,247,157,157,157,157,157,157,157,157,157,157,157,157,157,67,157,1,0,0,0,157,157,157,157,157,157,157,157],
-		  "err": "Unsupported"
+		  "err": "InvalidData"
 		},
 		{
 		  "name": "Truncated object with excessive length announcement",
 		  "bytes": [5,136,112,0,0,0,0,0,0,0,7,12,5,4],
-		  "err": "InOutError",
+		  "err": "InvalidData",
 		  "err_32bit": "Unsupported"
 		}
 	  ],
@@ -94,7 +94,7 @@ extension TestVectors.Err {
 		  {
 			"name": "Truncated boolean (expected 2, got 1)",
 			"bytes": [1,2,0],
-			"err": "InOutError"
+			"err": "InvalidData"
 		  }
 		],
 		"integer": [
@@ -126,7 +126,7 @@ extension TestVectors.Err {
 		  {
 			"name": "Truncated integer (expected 2, got 1)",
 			"bytes": [2,2,128],
-			"err": "InOutError"
+			"err": "InvalidData"
 		  }
 		],
 		"null": [
@@ -143,7 +143,7 @@ extension TestVectors.Err {
 		  {
 			"name": "Truncated null object (expected 2, got 1)",
 			"bytes": [5,2,0],
-			"err": "InOutError"
+			"err": "InvalidData"
 		  }
 		],
 		"octet_string": [
@@ -155,7 +155,7 @@ extension TestVectors.Err {
 		  {
 			"name": "Truncated octet string (expected 1, got 0)",
 			"bytes": [4,1],
-			"err": "InOutError"
+			"err": "InvalidData"
 		  }
 		],
 		"sequence": [
@@ -167,12 +167,12 @@ extension TestVectors.Err {
 		  {
 			"name": "Truncated sequence (truncated subobject; expected 2, got 1)",
 			"bytes": [48,3,2,2,128],
-			"err": "InOutError"
+			"err": "InvalidData"
 		  },
 		  {
 			"name": "Truncated sequence (expected 5, got 4)",
 			"bytes": [48,5,4,2,55,228],
-			"err": "InOutError"
+			"err": "InvalidData"
 		  }
 		],
 		"utf8_string": [
@@ -189,7 +189,7 @@ extension TestVectors.Err {
 		  {
 			"name": "Truncated UTF-8 string (expected 2, got 1)",
 			"bytes": [12,2,84],
-			"err": "InOutError"
+			"err": "InvalidData"
 		  }
 		]
 	  }

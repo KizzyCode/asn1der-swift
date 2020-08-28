@@ -1,19 +1,18 @@
 import XCTest
 @testable import Asn1Der
 
+
 final class Asn1DerTestOk: XCTestCase {
 	func testLengthOk() throws {
 		for test in TestVectors.Ok.tests.length {
 			var source = Data(test.bytes)
-			let value = try Int(decodeLength: { try source.read() })
+            let value = try Int(derLength: &source)
 			XCTAssertEqual(value, test.value, "@\"\(test.name)\"")
 			
-			var bytes = Data()
-			bytes.writeLength(test.value)
+            let bytes = test.value.derLength
 			XCTAssertEqual(bytes, Data(test.bytes), "@\"\(test.name)\"")
 		}
 	}
-
 
 	func testObjectOk() throws {
 		for test in TestVectors.Ok.tests.object {
@@ -24,7 +23,6 @@ final class Asn1DerTestOk: XCTestCase {
 			XCTAssertEqual(bytes, Data(test.bytes))
 		}
 	}
-
 
 	func testBooleanOk() throws {
 		for test in TestVectors.Ok.tests.typed.bool {
@@ -38,7 +36,6 @@ final class Asn1DerTestOk: XCTestCase {
 			XCTAssertEqual(native.encode(), Data(test.bytes))
 		}
 	}
-	
 	
 	func testIntegerOk() throws {
 		func testNative<T: DERObject & UnsignedInteger>(_ type: T.Type, _ test: TestVectors.Ok.TypedInteger) throws {
@@ -64,7 +61,6 @@ final class Asn1DerTestOk: XCTestCase {
 		}
 	}
 	
-	
 	func testNullOk() throws {
 		for test in TestVectors.Ok.tests.typed.null {
 			let object = try DERNull(decode: test.bytes)
@@ -76,7 +72,6 @@ final class Asn1DerTestOk: XCTestCase {
 			XCTAssertEqual(native.encode(), Data(test.bytes))
 		}
 	}
-	
 	
 	func testOctetStringOk() throws {
 		for test in TestVectors.Ok.tests.typed.octet_string {
@@ -90,7 +85,6 @@ final class Asn1DerTestOk: XCTestCase {
 			XCTAssertEqual(native.encode(), Data(test.bytes))
 		}
 	}
-	
 	
 	func testSequenceOk() throws {
 		for test in TestVectors.Ok.tests.typed.sequence {
@@ -112,7 +106,6 @@ final class Asn1DerTestOk: XCTestCase {
 		}
 	}
 
-
 	func testUTF8StringOk() throws {
 		for test in TestVectors.Ok.tests.typed.utf8_string {
 			let object = try DERUTF8String(decode: test.bytes)
@@ -126,7 +119,6 @@ final class Asn1DerTestOk: XCTestCase {
 		}
 	}
 	
-	
 	// Ensure that our example works
 	func testExample() throws {
 		// Declare an encoded integer with value `7`
@@ -139,7 +131,7 @@ final class Asn1DerTestOk: XCTestCase {
 		let reencodedObject = object.encode()
 		XCTAssertEqual(reencodedObject, encodedInt)
 
-
+        
 		// Decode an UInt32
 		let uint = try UInt32(decode: encodedInt)
 		XCTAssertEqual(uint, 7)
@@ -148,18 +140,22 @@ final class Asn1DerTestOk: XCTestCase {
 		let reencodedInt = uint.encode()
 		XCTAssertEqual(reencodedInt, encodedInt)
 		
-		
+        
 		// Decode a `RawRepresentable` enum
-		enum TestEnum: String, DERObject {
+        // swiftlint:disable nesting
+		enum TestEnum: String, Codable {
 			case variantA = "Variant A", variantB = "Variant B"
 		}
 		let encodedTestEnum = Data([0x0c, 0x09, 0x56, 0x61, 0x72, 0x69, 0x61, 0x6E, 0x74, 0x20, 0x41])
 		
 		// Decode the enum
-		let testEnum: TestEnum = try TestEnum(decode: encodedTestEnum)
+        let testEnum: TestEnum = try DERDecoder().decode(data: encodedTestEnum)
 		XCTAssertEqual(testEnum, .variantA)
+        
+        // Reencode the enum
+        let reencodedTestEnum = try DEREncoder().encode(testEnum)
+        XCTAssertEqual(reencodedTestEnum, encodedTestEnum)
 	}
-
 
 	static var allTests = [
 		("testLengthOk", testLengthOk),
@@ -170,6 +166,6 @@ final class Asn1DerTestOk: XCTestCase {
 		("testOctetStringOk", testOctetStringOk),
 		("testSequenceOk", testSequenceOk),
 		("testUTF8StringOk", testUTF8StringOk),
-		("testExample", testExample),
+		("testExample", testExample)
 	]
 }
