@@ -51,4 +51,4 @@ XCTAssertEqual(testEnum, .variantA)
 
 
 ## Support for `Decode`/`Encode`
-Support for Swift's `Decode` and `Encode` protocols is not implemented yet but on my roadmap and will come eventually 😅
+This crate now has experimental support for `Codable` (aka `Encode & Decode`) 🥳
