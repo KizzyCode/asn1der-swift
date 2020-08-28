@@ -30,7 +30,7 @@ private class GenericObject: DERTyped {
         self._wrapped = object
     }
     
-    @available(*, deprecated, message: "Constructor to conform to `DERObject` – will raise a fatal error")
+    @available(*, deprecated, message: "Constructor to conform to `DERTyped` – will raise a fatal error")
     required public init(with object: DERAny) throws {
         fatalError("Cannot decode a generic top-level object")
     }
