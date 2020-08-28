@@ -103,7 +103,7 @@ extension DERAny: DERTyped {
     public func object() -> DERAny {
         self
     }
-    // "Override" the propagating default implementation with the real implementationb here
+    // "Override" the propagating default implementation with the real implementation here
     public func encode(to data: inout Data) {
         data.append(self.tag)
         data.append(self.value.count.derLength)
