@@ -4,7 +4,7 @@ import XCTest
 final class Asn1DerCoderTest: XCTestCase {
     func testOk() throws {
         for test in TestVectors.Coder.ok {
-            let object = try DERDecoder().decode(TestVectors.Coder.Outer.self, data: test.bytes)
+            let object = try DERDecoder().decode(TestVectors.Coder.Outer.self, from: test.bytes)
             XCTAssertEqual(object, test.value, "@\"\(test.name)\"")
             
             let bytes = try DEREncoder().encode(object)

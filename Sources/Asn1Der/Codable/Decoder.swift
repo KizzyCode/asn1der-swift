@@ -226,7 +226,7 @@ public class DERDecoder {
     ///     - data: The data to decode
     ///  - Returns: The decoded object
     ///  - Throws: `DERError` in case of decoding errors
-    public func decode<T: Decodable, D: DataProtocol>(_ type: T.Type = T.self, data: D) throws -> T {
+    public func decode<T: Decodable, D: DataProtocol>(_ type: T.Type = T.self, from data: D) throws -> T {
         // Decode object
         var data = Data(data)
         let object = try DERAny(decode: &data)

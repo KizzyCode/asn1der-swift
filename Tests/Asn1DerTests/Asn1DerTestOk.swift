@@ -149,7 +149,7 @@ final class Asn1DerTestOk: XCTestCase {
         let encodedTestEnum = Data([0x0c, 0x09, 0x56, 0x61, 0x72, 0x69, 0x61, 0x6E, 0x74, 0x20, 0x41])
         
         // Decode the enum
-        let testEnum: TestEnum = try DERDecoder().decode(data: encodedTestEnum)
+        let testEnum: TestEnum = try DERDecoder().decode(from: encodedTestEnum)
         XCTAssertEqual(testEnum, .variantA)
         
         // Reencode the enum
