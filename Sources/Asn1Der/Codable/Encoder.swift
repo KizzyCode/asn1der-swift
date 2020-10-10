@@ -307,3 +307,10 @@ public class DEREncoder {
         return encoder.topLevel.encode()
     }
 }
+#if canImport(Combine)
+import Combine
+
+extension DEREncoder: TopLevelEncoder {
+    public typealias Output = Data
+}
+#endif

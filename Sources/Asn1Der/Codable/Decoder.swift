@@ -226,9 +226,9 @@ public class DERDecoder {
     ///     - data: The data to decode
     ///  - Returns: The decoded object
     ///  - Throws: `DERError` in case of decoding errors
-    public func decode<T: Decodable, D: DataProtocol>(_ type: T.Type = T.self, from data: D) throws -> T {
+    public func decode<T: Decodable>(_ type: T.Type = T.self, from data: Data) throws -> T {
         // Decode object
-        var data = Data(data)
+        var data = data
         let object = try DERAny(decode: &data)
         
         // Validate that there are no trailing bytes left if the corresponding option is set
@@ -241,3 +241,10 @@ public class DERDecoder {
         return try T(from: decoder)
     }
 }
+#if canImport(Combine)
+import Combine
+
+extension DERDecoder: TopLevelDecoder {
+    public typealias Input = Data
+}
+#endif
