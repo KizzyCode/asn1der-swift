@@ -36,7 +36,7 @@ private struct SequenceWalker<Key> {
                 defer { self.position.value += 1 }
                 return self.objects[self.currentIndex].object()
             default:
-                throw DERError.invalidData("The DER sequence has no field left to decode key \"\(key ?? "<unkeyed>")\"")
+                throw DERError.invalidData("There is no field left to decode key \"\(key ?? "<unkeyed>")\"")
         }
     }
 }
@@ -47,7 +47,7 @@ extension SequenceWalker: KeyedDecodingContainerProtocol where Key: CodingKey {
     func decodeNil(forKey key: Key) throws -> Bool {
         let isNil = (try? DERNull(with: try self.next())) != nil
         if !isNil {
-            // Rewind the index if because if we don't have nil the field is read twice
+            // Rewind the index if because if we don't have nil the field must be read twice
             self.position.value -= 1
         }
         return isNil
@@ -84,7 +84,7 @@ extension SequenceWalker: UnkeyedDecodingContainer {
     func decodeNil() throws -> Bool {
         let isNil = (try? DERNull(with: try self.next())) != nil
         if !isNil {
-            // Rewind the index if because if we don't have nil the field is read twice
+            // Rewind the index if because if we don't have nil the field must be read twice
             self.position.value -= 1
         }
         return isNil

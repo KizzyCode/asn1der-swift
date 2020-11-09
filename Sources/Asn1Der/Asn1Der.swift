@@ -67,7 +67,7 @@ public extension DERTyped {
 
 
 /// An untyped/generic DER object
-final public class DERAny {
+public struct DERAny {
     /// The object tag
     public let tag: UInt8
     /// The object value
@@ -80,10 +80,10 @@ final public class DERAny {
     }
 }
 extension DERAny: DERTyped {
-    public convenience init(with object: DERAny) {
+    public init(with object: DERAny) {
         self.init(tag: object.tag, value: object.value)
     }
-    public convenience init(decode data: inout Data) throws {
+    public init(decode data: inout Data) throws {
         // Read tag and length
         guard let tag = data.popFirst() else {
             throw DERError.invalidData("DER object is truncated")

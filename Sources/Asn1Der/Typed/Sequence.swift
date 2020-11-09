@@ -50,7 +50,7 @@ extension DERSequenceIterator: IteratorProtocol {
 
 
 /// A DER sequence object
-final public class DERSequence: DERTyped {
+public struct DERSequence: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x30
     
