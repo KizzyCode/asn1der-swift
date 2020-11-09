@@ -2,7 +2,7 @@ import Foundation
 
 
 /// A DER octet string object
-final public class DEROctetString: DERTyped {
+public struct DEROctetString: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x04
 

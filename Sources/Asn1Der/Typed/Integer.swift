@@ -2,7 +2,7 @@ import Foundation
 
 
 /// A DER integer object
-final public class DERInteger: DERTyped {
+public struct DERInteger: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x02
 

@@ -2,7 +2,7 @@ import Foundation
 
 
 /// An iterator over a DER sequence object
-final public class DERSequenceIterator {
+public struct DERSequenceIterator {
     /// The sequence to iterate over
     private let sequence: DERSequence
     /// The position within the sequence
@@ -25,9 +25,9 @@ final public class DERSequenceIterator {
     ///  - Parameter type: The type as which the next element should be decoded
     ///  - Returns: The next element
     ///  - Throws:
-    ///     - `DERError.other` if the iterator is exhaustet
+    ///     - `DERError.other` if the iterator is exhausted
     ///     - `DERError` if the next element cannot be decoded as `T`
-    public func next<T: DERTyped>(type: T.Type = T.self) throws -> T {
+    public mutating func next<T: DERTyped>(type: T.Type = T.self) throws -> T {
         guard let next = self.next() else {
             throw DERError.other("The iterator is exhaustet")
         }
@@ -37,7 +37,7 @@ final public class DERSequenceIterator {
 extension DERSequenceIterator: IteratorProtocol {
     public typealias Element = DERTyped
     
-    public func next() -> DERTyped? {
+    public mutating func next() -> DERTyped? {
         switch self.remaining {
             case 0:
                 return nil

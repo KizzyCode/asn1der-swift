@@ -2,7 +2,7 @@ import Foundation
 
 
 /// A DER boolean object
-final public class DERBoolean: DERTyped {
+public struct DERBoolean: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x01
     

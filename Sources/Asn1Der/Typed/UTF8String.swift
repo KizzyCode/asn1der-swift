@@ -2,7 +2,7 @@ import Foundation
 
 
 /// A DER UTF-8 string object
-final public class DERUTF8String: DERTyped {
+public struct DERUTF8String: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x0c
 

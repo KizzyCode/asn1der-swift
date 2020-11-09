@@ -2,7 +2,7 @@ import Foundation
 
 
 /// A DER null object
-final public class DERNull: DERTyped {
+public struct DERNull: DERTyped {
     /// The associated DER tag
     public static let tag: UInt8 = 0x05
 
