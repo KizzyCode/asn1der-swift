@@ -29,6 +29,14 @@ public struct DERUTF8String: DERTyped {
         DERAny(tag: Self.tag, value: self.value.data(using: .utf8)!)
     }
 }
+extension DERUTF8String: Codable {
+    public init(from decoder: Decoder) throws {
+        self.init(try String(from: decoder))
+    }
+    public func encode(to encoder: Encoder) throws {
+        try self.value.encode(to: encoder)
+    }
+}
 
 
 extension String: DERTyped {

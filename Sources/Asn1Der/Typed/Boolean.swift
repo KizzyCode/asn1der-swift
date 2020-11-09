@@ -33,6 +33,14 @@ public struct DERBoolean: DERTyped {
         }
     }
 }
+extension DERBoolean: Codable {
+    public init(from decoder: Decoder) throws {
+        self.init(try Bool(from: decoder))
+    }
+    public func encode(to encoder: Encoder) throws {
+        try self.value.encode(to: encoder)
+    }
+}
 
 
 extension Bool: DERTyped {

@@ -21,6 +21,17 @@ public struct DERNull: DERTyped {
         DERAny(tag: Self.tag, value: Data())
     }
 }
+extension DERNull: Codable {
+    public init(from decoder: Decoder) throws {
+        guard try Bool?(from: decoder) == nil else {
+            throw DERError.invalidData("Object is not a valid null object")
+        }
+        self.init()
+    }
+    public func encode(to encoder: Encoder) throws {
+        try Bool?.none.encode(to: encoder)
+    }
+}
 
 
 extension Optional: DERTyped where Wrapped: DERTyped {

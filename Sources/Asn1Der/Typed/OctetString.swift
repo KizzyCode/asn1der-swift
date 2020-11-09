@@ -26,6 +26,14 @@ public struct DEROctetString: DERTyped {
         DERAny(tag: Self.tag, value: self.value)
     }
 }
+extension DEROctetString: Codable {
+    public init(from decoder: Decoder) throws {
+        self.init(try Data(from: decoder))
+    }
+    public func encode(to encoder: Encoder) throws {
+        try self.value.encode(to: encoder)
+    }
+}
 
 
 extension Data: DERTyped {
